@@ -1,30 +1,42 @@
-(() => {
+﻿(() => {
   const PERSIAN = /[\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
   const SKIP = "code, pre, kbd, samp, script, style, noscript, svg, math";
   const FIELDS =
     'textarea, input:not([type]), input[type="text"], input[type="search"], [contenteditable="true"], [contenteditable=""]';
   const root = document.documentElement;
-  const url = (f) => chrome.runtime.getURL("fonts/" + encodeURIComponent(f));
-
-  // unicode-range limits Vazir to Persian glyphs, so Latin text keeps the site's own font.
-  const range =
-    "U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200F, U+FB50-FDFF, U+FE70-FEFF";
   const style = document.createElement("style");
-  style.textContent = `
-@font-face{font-family:"Farsiamo";font-weight:100 500;font-display:swap;size-adjust:115%;unicode-range:${range};
-  src:local("Vazir"),local("Vazir Regular"),local("Vazir-FD"),url("${url("Vazir.ttf")}") format("truetype")}
-@font-face{font-family:"Farsiamo";font-weight:600 900;font-display:swap;size-adjust:115%;unicode-range:${range};
-  src:local("Vazir Bold"),local("Vazir-Bold"),local("Vazir"),url("${url("Vazir Bold.ttf")}") format("truetype"),url("${url("Vazir.ttf")}") format("truetype")}
-html[data-farsiamo-on] [data-farsiamo]{font-family:"Farsiamo",var(--farsiamo-orig) !important}`;
   (document.head || root).appendChild(style);
 
-  document.fonts.load('16px "Farsiamo"', "فارسی").then(() => {
-    if (!document.fonts.check('16px "Farsiamo"', "فارسی")) {
-      console.warn(
-        "Farsiamo: Vazir was not found. Check the files in fonts/, then reload the extension."
+  let loadedFaces = [];
+  let applyToken = 0;
+
+  // Fonts are loaded from buffers (not @font-face URLs) so a site's CSP font-src cannot block them.
+  async function applyFont(id) {
+    const token = ++applyToken;
+    const font = farsiamoFontById(id);
+    const family = "Farsiamo-" + font.id;
+    try {
+      const faces = await Promise.all(
+        Object.entries(font.files).map(async ([weight, file]) => {
+          const res = await fetch(chrome.runtime.getURL(`fonts/${font.dir}/${encodeURIComponent(file)}`));
+          const face = new FontFace(family, await res.arrayBuffer(), {
+            weight,
+            unicodeRange: FARSIAMO_RANGE,
+            display: "swap",
+          });
+          if ("sizeAdjust" in face) face.sizeAdjust = font.scale + "%";
+          return face.load();
+        })
       );
+      if (token !== applyToken) return;
+      loadedFaces.forEach((f) => document.fonts.delete(f));
+      faces.forEach((f) => document.fonts.add(f));
+      loadedFaces = faces;
+      style.textContent = `html[data-farsiamo-on] [data-farsiamo]{font-family:"${family}",var(--farsiamo-orig) !important}`;
+    } catch (e) {
+      console.warn("Farsiamo: could not load font " + font.id, e);
     }
-  });
+  }
 
   function mark(el) {
     if (!el || el.hasAttribute("data-farsiamo") || el.closest(SKIP)) return;
@@ -69,8 +81,12 @@ html[data-farsiamo-on] [data-farsiamo]{font-family:"Farsiamo",var(--farsiamo-ori
   }).observe(document.body, { childList: true, subtree: true, characterData: true });
 
   const apply = (on) => root.toggleAttribute("data-farsiamo-on", on);
-  chrome.storage.sync.get({ enabled: true }, ({ enabled }) => apply(enabled));
+  chrome.storage.sync.get({ enabled: true, font: FARSIAMO_DEFAULT_FONT }, ({ enabled, font }) => {
+    applyFont(font);
+    apply(enabled);
+  });
   chrome.storage.onChanged.addListener((changes) => {
+    if (changes.font) applyFont(changes.font.newValue);
     if (changes.enabled) apply(changes.enabled.newValue);
   });
 

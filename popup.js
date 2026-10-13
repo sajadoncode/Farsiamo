@@ -79,6 +79,33 @@ async function findActiveService() {
 chrome.storage.sync.get({ enabled: true }, ({ enabled }) => (box.checked = enabled));
 box.addEventListener("change", () => chrome.storage.sync.set({ enabled: box.checked }));
 
+const fontSelect = document.getElementById("font-select");
+const fontSample = document.getElementById("font-sample");
+const previewStyle = document.createElement("style");
+previewStyle.textContent = FARSIAMO_FONTS.map((f) => farsiamoFontFaces(f, "FarsiamoPreview-" + f.id, 400)).join("\n");
+document.head.append(previewStyle);
+
+const previewFamily = (id) => `"FarsiamoPreview-${id}", Tahoma, sans-serif`;
+
+for (const font of FARSIAMO_FONTS) {
+	const option = new Option(font.name, font.id);
+	option.style.fontFamily = previewFamily(font.id);
+	fontSelect.append(option);
+}
+
+function showFont(id) {
+	fontSelect.value = id;
+	fontSelect.style.fontFamily = previewFamily(id);
+	fontSample.style.fontFamily = previewFamily(id);
+}
+
+fontSelect.addEventListener("change", () => {
+	showFont(fontSelect.value);
+	chrome.storage.sync.set({ font: fontSelect.value });
+});
+
+chrome.storage.sync.get({ font: FARSIAMO_DEFAULT_FONT }, ({ font }) => showFont(farsiamoFontById(font).id));
+
 findActiveService().then((activeService) => {
 	showActiveService(activeService);
 	renderServices(activeService);
