@@ -1,0 +1,64 @@
+{
+  "manifest_version": 3,
+  "name": "Farsiamo",
+  "version": "1.0.0",
+  "description": "Renders Persian text with the Vazir font on popular AI chat sites.",
+  "permissions": ["storage", "activeTab"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Farsiamo"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://gemini.google.com/*",
+        "https://aistudio.google.com/*",
+        "https://claude.ai/*",
+        "https://copilot.cloud.microsoft/*",
+        "https://www.perplexity.ai/*",
+        "https://chat.deepseek.com/*",
+        "https://grok.com/*",
+        "https://chat.mistral.ai/*",
+        "https://chat.qwen.ai/*",
+        "https://poe.com/*",
+        "https://www.meta.ai/*",
+        "https://huggingface.co/chat/*"
+      ],
+      "js": ["content.js"],
+      "all_frames": true,
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["fonts/*"],
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://gemini.google.com/*",
+        "https://aistudio.google.com/*",
+        "https://claude.ai/*",
+        "https://copilot.cloud.microsoft/*",
+        "https://www.perplexity.ai/*",
+        "https://chat.deepseek.com/*",
+        "https://grok.com/*",
+        "https://chat.mistral.ai/*",
+        "https://chat.qwen.ai/*",
+        "https://poe.com/*",
+        "https://www.meta.ai/*",
+        "https://huggingface.co/*"
+      ]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "farsiamo@local",
+      "strict_min_version": "121.0"
+    }
+  }
+}
