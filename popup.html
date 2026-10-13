@@ -2,166 +2,47 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <style>
-    :root {
-      color: #1f2937;
-      background: #f5f7fa;
-      font-family: Tahoma, sans-serif;
-    }
-
-    body {
-      box-sizing: border-box;
-      margin: 0;
-      width: 340px;
-      min-height: 388px;
-      padding: 16px;
-    }
-
-    .topbar, .status-row, .service, .toggle-row { display: flex; align-items: center; }
-
-    .topbar { justify-content: space-between; margin-bottom: 18px; }
-    .brand { display: flex; align-items: center; gap: 9px; }
-    .brand-mark {
-      display: grid;
-      width: 34px;
-      height: 34px;
-      place-items: center;
-      border-radius: 8px;
-      background: #117a65;
-      color: #fff;
-      font-family: Tahoma, sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-    }
-    .brand h1 { margin: 0; color: #152c47; font-size: 21px; line-height: 1; font-weight: 700; }
-    .brand p { margin: 3px 0 0; color: #748092; font-size: 12px; line-height: 1; }
-
-    .toggle-row {
-      gap: 8px;
-      color: #4b5563;
-      font-size: 13px;
-    }
-    .switch { position: relative; width: 38px; height: 21px; }
-    .switch input { width: 0; height: 0; opacity: 0; }
-    .slider {
-      position: absolute;
-      inset: 0;
-      cursor: pointer;
-      border-radius: 14px;
-      background: #cbd5e1;
-      transition: background .18s ease;
-    }
-    .slider::before {
-      position: absolute;
-      bottom: 3px;
-      right: 3px;
-      width: 15px;
-      height: 15px;
-      border-radius: 50%;
-      background: #fff;
-      content: "";
-      transition: transform .18s ease;
-    }
-    .switch input:checked + .slider { background: #117a65; }
-    .switch input:checked + .slider::before { transform: translateX(-17px); }
-    .switch input:focus-visible + .slider { outline: 2px solid #117a65; outline-offset: 2px; }
-
-    .current {
-      padding: 12px;
-      border: 1px solid #dce3ea;
-      border-radius: 7px;
-      background: #fff;
-    }
-    .status-row { justify-content: space-between; gap: 10px; }
-    .status-copy { min-width: 0; }
-    .eyebrow { display: block; color: #7b8794; font-size: 11px; line-height: 1; }
-    #active-name { display: block; margin-top: 3px; color: #183451; font-family: Tahoma, sans-serif; font-size: 14px; font-weight: 700; }
-    .current-icon { flex: 0 0 auto; }
-
-    .services-title { display: block; margin: 17px 1px 8px; color: #64748b; font-size: 12px; }
-    #services { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
-    .service {
-      min-width: 0;
-      height: 56px;
-      justify-content: center;
-      border: 1px solid #dde3ea;
-      border-radius: 7px;
-      background: #fff;
-      opacity: .34;
-      filter: grayscale(1);
-      transition: opacity .18s ease, filter .18s ease, border-color .18s ease, box-shadow .18s ease;
-    }
-    .service.active {
-      border-color: #117a65;
-      opacity: 1;
-      filter: none;
-      box-shadow: 0 0 0 2px #cbe8df;
-    }
-    .service-icon {
-      display: grid;
-      width: 31px;
-      height: 31px;
-      place-items: center;
-      border-radius: 7px;
-      color: var(--icon-color, #334155);
-      background: var(--icon-bg, #e2e8f0);
-      font-family: Tahoma, sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0;
-    }
-    .service-icon.large { width: 36px; height: 36px; font-size: 11px; }
-    .service.unknown { opacity: .7; filter: none; }
-    .service.unknown .service-icon { background: #e9eef4; color: #687688; }
-
-    .font-picker { margin-bottom: 14px; }
-    .font-picker label { display: block; margin: 0 1px 6px; color: #64748b; font-size: 12px; }
-    #font-select {
-      box-sizing: border-box;
-      width: 100%;
-      padding: 8px 10px;
-      border: 1px solid #dce3ea;
-      border-radius: 7px;
-      background: #fff;
-      color: #183451;
-      font-size: 15px;
-    }
-    #font-select:focus-visible { outline: 2px solid #117a65; outline-offset: 2px; }
-    #font-sample { margin: 6px 1px 0; color: #475569; font-size: 15px; line-height: 1.6; }
-    .footer { margin: 15px 1px 0; color: #8792a2; font-size: 11px; line-height: 1.25; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="popup.css">
 </head>
-<body>
-  <header class="topbar">
-    <div class="brand">
-      <span class="brand-mark">فا</span>
-      <div><h1>فارسیامو</h1><p>فونت فارسی در گفتگوهای هوش مصنوعی</p></div>
+<body class="w-[340px] bg-zinc-50 p-4 font-sans text-zinc-900 antialiased">
+  <header class="mb-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <span class="grid size-10 place-items-center rounded-xl bg-zinc-900 text-base font-bold text-emerald-300 shadow-sm">فا</span>
+      <div>
+        <h1 class="text-[17px] font-bold leading-none tracking-tight">فارسیامو</h1>
+        <p class="mt-1.5 text-[11px] leading-none text-zinc-500">فونت فارسی در گفتگوهای هوش مصنوعی</p>
+      </div>
     </div>
-    <label class="toggle-row" title="فعال‌سازی فونت وزیر">
-      <span>فعال</span>
-      <span class="switch"><input type="checkbox" id="enabled"><span class="slider"></span></span>
+    <label class="relative inline-flex cursor-pointer items-center" title="فعال‌سازی افزونه">
+      <input type="checkbox" id="enabled" class="peer sr-only">
+      <span class="block h-6 w-11 rounded-full bg-zinc-300 transition-colors duration-200 peer-checked:bg-emerald-600 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-600 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-zinc-50 after:absolute after:start-0.5 after:top-0.5 after:size-5 after:rounded-full after:bg-white after:shadow after:transition-transform after:duration-200 after:content-[''] peer-checked:after:-translate-x-5"></span>
     </label>
   </header>
 
   <main>
-    <section class="font-picker">
-      <label for="font-select">انتخاب فونت</label>
-      <select id="font-select"></select>
-      <p id="font-sample">نمونه متن فارسی ۱۲۳</p>
-    </section>
-    <section class="current" aria-live="polite">
-      <div class="status-row">
-        <div class="status-copy">
-          <span class="eyebrow">سرویس باز فعلی</span>
-          <strong id="active-name">در حال بررسی…</strong>
-        </div>
-        <span class="service-icon large current-icon" id="active-icon">AI</span>
+    <section class="rounded-2xl bg-white p-3.5 shadow-sm ring-1 ring-zinc-200/80">
+      <label for="font-select" class="mb-2 block text-xs font-medium text-zinc-500">انتخاب فونت</label>
+      <div class="relative">
+        <select id="font-select" class="w-full cursor-pointer appearance-none rounded-xl border-0 bg-zinc-50 py-2.5 pe-10 ps-3.5 text-[15px] text-zinc-900 ring-1 ring-inset ring-zinc-200 transition hover:ring-zinc-300 focus:outline-none focus:ring-2 focus:ring-emerald-600"></select>
+        <svg class="pointer-events-none absolute inset-y-0 end-3 my-auto size-4 text-zinc-400" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 7.5 5 5 5-5"/></svg>
       </div>
+      <p id="font-sample" class="mt-3 rounded-xl bg-zinc-50 px-3.5 py-3 text-lg leading-8 text-zinc-700">نمونه متن فارسی ۱۲۳</p>
     </section>
-    <span class="services-title">سرویس‌های پشتیبانی‌شده</span>
-    <section id="services" aria-label="سرویس‌های پشتیبانی‌شده"></section>
+
+    <section class="mt-3 flex items-center justify-between rounded-2xl bg-white p-3.5 shadow-sm ring-1 ring-zinc-200/80" aria-live="polite">
+      <div class="min-w-0">
+        <span class="block text-[11px] text-zinc-500">سرویس باز فعلی</span>
+        <strong id="active-name" class="mt-1 block text-sm font-bold">در حال بررسی…</strong>
+      </div>
+      <span id="active-icon" class="grid size-10 place-items-center rounded-xl bg-zinc-100 text-[11px] font-bold text-zinc-500">AI</span>
+    </section>
+
+    <p class="mb-2 mt-5 px-1 text-xs font-medium text-zinc-500">سرویس‌های پشتیبانی‌شده</p>
+    <section id="services" class="grid grid-cols-5 gap-2" aria-label="سرویس‌های پشتیبانی‌شده"></section>
   </main>
-  <p class="footer" id="footer-message">برای اعمال فونت، افزونه را روشن نگه دارید.</p>
+
+  <p id="footer-message" class="mt-4 px-1 text-[11px] leading-5 text-zinc-400">برای اعمال فونت، افزونه را روشن نگه دارید.</p>
   <script src="fonts.js"></script>
   <script src="popup.js"></script>
 </body>

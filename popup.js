@@ -34,10 +34,12 @@ function matchesService(service, url) {
 
 function makeIcon(service, large = false) {
 	const icon = document.createElement("span");
-	icon.className = `service-icon${large ? " large" : ""}`;
+	icon.className = large
+		? "grid size-10 place-items-center rounded-xl text-[11px] font-bold"
+		: "grid size-8 place-items-center rounded-lg text-[10px] font-bold";
 	icon.textContent = service.icon;
-	icon.style.setProperty("--icon-color", service.color);
-	icon.style.setProperty("--icon-bg", service.background);
+	icon.style.color = service.color;
+	icon.style.backgroundColor = service.background;
 	return icon;
 }
 
@@ -46,8 +48,11 @@ function renderServices(activeService) {
 	for (const service of services) {
 		if (shownHosts.has(service.name)) continue;
 		shownHosts.add(service.name);
+		const isActive = activeService?.name === service.name;
 		const item = document.createElement("div");
-		item.className = `service${activeService?.name === service.name ? " active" : ""}`;
+		item.className = isActive
+			? "grid h-12 place-items-center rounded-xl bg-white shadow-sm ring-2 ring-emerald-600 transition"
+			: "grid h-12 place-items-center rounded-xl bg-white opacity-40 ring-1 ring-zinc-200/80 grayscale transition";
 		item.title = service.name;
 		item.setAttribute("aria-label", service.name);
 		item.append(makeIcon(service));
@@ -64,9 +69,7 @@ function showActiveService(activeService) {
 	}
 
 	activeNameElement.textContent = activeService.name;
-	const currentIcon = makeIcon(activeService, true);
-	currentIcon.classList.add("current-icon");
-	activeIconElement.replaceWith(currentIcon);
+	activeIconElement.replaceWith(makeIcon(activeService, true));
 }
 
 async function findActiveService() {
@@ -85,7 +88,10 @@ box.addEventListener("change", () => chrome.storage.sync.set({ enabled: box.chec
 const fontSelect = document.getElementById("font-select");
 const fontSample = document.getElementById("font-sample");
 const previewStyle = document.createElement("style");
-previewStyle.textContent = FARSIAMO_FONTS.map((f) => farsiamoFontFaces(f, "FarsiamoPreview-" + f.id, 400)).join("\n");
+previewStyle.textContent =
+	farsiamoFontFaces(farsiamoFontById("vazir"), "FarsiamoUI") +
+	"\n" +
+	FARSIAMO_FONTS.map((f) => farsiamoFontFaces(f, "FarsiamoPreview-" + f.id, 400)).join("\n");
 document.head.append(previewStyle);
 
 const previewFamily = (id) => `"FarsiamoPreview-${id}", Tahoma, sans-serif`;

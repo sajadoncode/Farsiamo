@@ -1,0 +1,11 @@
+{
+  "name": "farsiamo",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -c tailwind.config.js -i src/input.css -o popup.css --minify",
+    "watch:css": "tailwindcss -c tailwind.config.js -i src/input.css -o popup.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}
