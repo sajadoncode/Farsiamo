@@ -1,5 +1,6 @@
 // Shared by content.js and popup.js. `files` maps CSS weight -> file name inside fonts/<dir>/.
-const FARSIAMO_FONTS = [
+// `var` (not const) so injecting this file into the same page twice does not throw.
+var FARSIAMO_FONTS = [
   {
     id: "vazir", name: "وزیر", dir: "vazir", scale: 115,
     files: { 400: "Vazir.ttf", 700: "Vazir Bold.ttf" },
@@ -48,10 +49,10 @@ const FARSIAMO_FONTS = [
   },
 ];
 
-const FARSIAMO_DEFAULT_FONT = "vazir";
+var FARSIAMO_DEFAULT_FONT = "vazir";
 
 // unicode-range limits the font to Persian glyphs, so Latin text keeps the site's own font.
-const FARSIAMO_RANGE =
+var FARSIAMO_RANGE =
   "U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200F, U+FB50-FDFF, U+FE70-FEFF";
 
 function farsiamoFontById(id) {

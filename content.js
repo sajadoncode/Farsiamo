@@ -1,4 +1,6 @@
 ﻿(() => {
+  if (window.__farsiamoLoaded) return;
+  window.__farsiamoLoaded = true;
   const PERSIAN = /[\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
   const SKIP = "code, pre, kbd, samp, script, style, noscript, svg, math";
   const FIELDS =
@@ -56,7 +58,8 @@
   // Messages follow their first letter; input fields follow the last letter typed so switching language flips them.
   function setDir(block, isField) {
     if (!block) return;
-    const text = block.value ?? block.textContent ?? "";
+    // <li>, <meter> etc. expose a numeric .value, so only trust string values (inputs, textareas).
+    const text = typeof block.value === "string" ? block.value : block.textContent ?? "";
     const letters = text.match(/\p{L}/gu);
     const letter = letters && (isField ? letters[letters.length - 1] : letters[0]);
     block.toggleAttribute("data-farsiamo-rtl", !!letter && PERSIAN.test(letter));
@@ -144,6 +147,9 @@
   chrome.storage.onChanged.addListener((changes) => {
     if (changes.font) applyFont(changes.font.newValue);
     if (changes.enabled) apply(changes.enabled.newValue);
+  });
+  chrome.runtime.onMessage.addListener((msg) => {
+    if (msg?.type === "farsiamo-disable") apply(false);
   });
 
   scan(document.body);

@@ -53,11 +53,18 @@ function renderServices(activeService) {
 	}
 }
 
-async function findActiveService() {
+async function getActiveTab() {
 	try {
 		const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-		const activeUrl = tab?.url ? new URL(tab.url) : null;
-		return services.find((service) => matchesService(service, activeUrl)) || null;
+		return tab || null;
+	} catch {
+		return null;
+	}
+}
+
+function parseUrl(value) {
+	try {
+		return new URL(value);
 	} catch {
 		return null;
 	}
@@ -69,7 +76,7 @@ box.addEventListener("change", () => chrome.storage.sync.set({ enabled: box.chec
 const fontSelect = document.getElementById("font-select");
 const previewStyle = document.createElement("style");
 previewStyle.textContent =
-	farsiamoFontFaces(farsiamoFontById("vazir"), "FarsiamoUI") +
+	farsiamoFontFaces({ ...farsiamoFontById("vazir"), scale: 100 }, "FarsiamoUI") +
 	"\n" +
 	FARSIAMO_FONTS.map((f) => farsiamoFontFaces(f, "FarsiamoPreview-" + f.id, 400)).join("\n");
 document.head.append(previewStyle);
@@ -94,4 +101,45 @@ fontSelect.addEventListener("change", () => {
 
 chrome.storage.sync.get({ font: FARSIAMO_DEFAULT_FONT }, ({ font }) => showFont(farsiamoFontById(font).id));
 
-findActiveService().then(renderServices);
+const BUTTON_ADD = "shrink-0 rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-gray-950 transition hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400";
+const BUTTON_REMOVE = "shrink-0 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400";
+
+const siteSection = document.getElementById("site-section");
+const siteMessage = document.getElementById("site-message");
+const siteHost = document.getElementById("site-host");
+const siteButton = document.getElementById("site-button");
+
+async function setupSiteSection(tab, url) {
+	const origin = `https://${url.hostname}/*`;
+	let added = await chrome.permissions.contains({ origins: [origin] });
+
+	const render = () => {
+		siteMessage.textContent = added ? "این سایت فعال است" : "این سایت در فهرست نیست";
+		siteButton.textContent = added ? "حذف" : "افزودن";
+		siteButton.className = added ? BUTTON_REMOVE : BUTTON_ADD;
+	};
+
+	siteHost.textContent = url.hostname;
+	siteSection.hidden = false;
+	render();
+
+	siteButton.addEventListener("click", async () => {
+		if (added) {
+			try {
+				await chrome.tabs.sendMessage(tab.id, { type: "farsiamo-disable" });
+			} catch {}
+			added = !(await chrome.permissions.remove({ origins: [origin] }));
+		} else if (await chrome.permissions.request({ origins: [origin] })) {
+			added = true;
+		}
+		render();
+	});
+}
+
+(async () => {
+	const tab = await getActiveTab();
+	const url = tab?.url ? parseUrl(tab.url) : null;
+	const activeService = services.find((service) => matchesService(service, url)) || null;
+	renderServices(activeService);
+	if (url?.protocol === "https:" && !activeService) setupSiteSection(tab, url);
+})();
