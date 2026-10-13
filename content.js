@@ -4,7 +4,7 @@
   const FIELDS =
     'textarea, input:not([type]), input[type="text"], input[type="search"], [contenteditable="true"], [contenteditable=""]';
   const root = document.documentElement;
-  const url = (f) => chrome.runtime.getURL("fonts/" + f);
+  const url = (f) => chrome.runtime.getURL("fonts/" + encodeURIComponent(f));
 
   // unicode-range limits Vazir to Persian glyphs, so Latin text keeps the site's own font.
   const range =
@@ -12,16 +12,16 @@
   const style = document.createElement("style");
   style.textContent = `
 @font-face{font-family:"Farsiamo";font-weight:100 500;font-display:swap;size-adjust:115%;unicode-range:${range};
-  src:local("Vazir"),local("Vazir Regular"),local("Vazir-FD"),url("${url("BZar.ttf")}") format("truetype")}
+  src:local("Vazir"),local("Vazir Regular"),local("Vazir-FD"),url("${url("Vazir.ttf")}") format("truetype")}
 @font-face{font-family:"Farsiamo";font-weight:600 900;font-display:swap;size-adjust:115%;unicode-range:${range};
-  src:local("Vazir Bold"),local("Vazir-Bold"),local("Vazir"),url("${url("BZarBold.ttf")}") format("truetype"),url("${url("BZar.ttf")}") format("truetype")}
+  src:local("Vazir Bold"),local("Vazir-Bold"),local("Vazir"),url("${url("Vazir Bold.ttf")}") format("truetype"),url("${url("Vazir.ttf")}") format("truetype")}
 html[data-farsiamo-on] [data-farsiamo]{font-family:"Farsiamo",var(--farsiamo-orig) !important}`;
   (document.head || root).appendChild(style);
 
   document.fonts.load('16px "Farsiamo"', "فارسی").then(() => {
     if (!document.fonts.check('16px "Farsiamo"', "فارسی")) {
       console.warn(
-        "Farsiamo: Vazir was not found. Install Vazir or replace fonts/BZar.ttf with Vazir, then reload the extension."
+        "Farsiamo: Vazir was not found. Check the files in fonts/, then reload the extension."
       );
     }
   });
