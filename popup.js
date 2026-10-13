@@ -15,7 +15,6 @@ const services = [
 	{ name: "Qwen", host: "chat.qwen.ai", icon: "qwen" },
 	{ name: "Poe", host: "poe.com", icon: "poe" },
 	{ name: "Meta AI", host: "meta.ai", icon: "meta" },
-	{ name: "HuggingChat", host: "huggingface.co", path: "/chat", icon: "huggingface" },
 ];
 
 const box = document.getElementById("enabled");
@@ -33,20 +32,20 @@ function makeIcon(service) {
 	const img = document.createElement("img");
 	img.src = `icons/${service.icon}.svg`;
 	img.alt = "";
-	img.className = "size-6 object-contain";
+	img.className = "size-7 object-contain brightness-0 invert";
 	return img;
 }
 
 function renderServices(activeService) {
-	const shownHosts = new Set();
+	const shownNames = new Set();
 	for (const service of services) {
-		if (shownHosts.has(service.name)) continue;
-		shownHosts.add(service.name);
+		if (shownNames.has(service.name)) continue;
+		shownNames.add(service.name);
 		const isActive = activeService?.name === service.name;
 		const item = document.createElement("div");
 		item.className = isActive
-			? "grid h-12 place-items-center rounded-xl bg-white shadow-sm ring-2 ring-emerald-600 transition"
-			: "grid h-12 place-items-center rounded-xl bg-white opacity-40 ring-1 ring-zinc-200/80 grayscale transition";
+			? "grid h-[72px] place-items-center bg-sky-950/60 shadow-[inset_0_0_0_1px_rgba(56,189,248,0.55)]"
+			: "grid h-[72px] place-items-center bg-gray-950 opacity-35 transition hover:opacity-70";
 		item.title = service.name;
 		item.setAttribute("aria-label", service.name);
 		item.append(makeIcon(service));
