@@ -2,10 +2,15 @@
   const PERSIAN = /[\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
   const SKIP = "code, pre, kbd, samp, script, style, noscript, svg, math";
   const FIELDS =
-    'textarea, input:not([type]), input[type="text"], input[type="search"], [contenteditable="true"], [contenteditable=""]';
+    'textarea, input:not([type]), input[type="text"], input[type="search"], [contenteditable="true"], [contenteditable=""], [contenteditable="plaintext-only"]';
   const root = document.documentElement;
   const style = document.createElement("style");
   (document.head || root).appendChild(style);
+
+  const dirStyle = document.createElement("style");
+  dirStyle.textContent =
+    "html[data-farsiamo-on] [data-farsiamo-rtl]{direction:rtl !important;text-align:start !important}";
+  (document.head || root).appendChild(dirStyle);
 
   let loadedFaces = [];
   let applyToken = 0;
@@ -38,10 +43,55 @@
     }
   }
 
+  // Nearest ancestor that lays out as a block, so direction applies to the whole paragraph.
+  function blockOf(el) {
+    while (el && el !== document.body && el !== root) {
+      const d = getComputedStyle(el).display;
+      if (d !== "inline" && d !== "contents") return el;
+      el = el.parentElement;
+    }
+    return null;
+  }
+
+  // Messages follow their first letter; input fields follow the last letter typed so switching language flips them.
+  function setDir(block, isField) {
+    if (!block) return;
+    const text = block.value ?? block.textContent ?? "";
+    const letters = text.match(/\p{L}/gu);
+    const letter = letters && (isField ? letters[letters.length - 1] : letters[0]);
+    block.toggleAttribute("data-farsiamo-rtl", !!letter && PERSIAN.test(letter));
+  }
+
   function mark(el) {
-    if (!el || el.hasAttribute("data-farsiamo") || el.closest(SKIP)) return;
+    if (!el || el.closest(SKIP)) return;
+    const field = fieldOf(el);
+    if (field) {
+      // Inner editor paragraphs must not carry their own direction, or they go stale when the language changes.
+      const inner = blockOf(el);
+      if (inner && inner !== field) inner.removeAttribute("data-farsiamo-rtl");
+      setDir(field, true);
+    } else {
+      setDir(blockOf(el));
+    }
+    if (el.hasAttribute("data-farsiamo")) return;
     el.style.setProperty("--farsiamo-orig", getComputedStyle(el).fontFamily);
     el.setAttribute("data-farsiamo", "");
+  }
+
+  function fieldOf(node) {
+    const el = node instanceof Element ? node : node?.parentElement;
+    return el?.closest(FIELDS) || null;
+  }
+
+  for (const type of ["input", "keyup", "compositionend"]) {
+    document.addEventListener(
+      type,
+      (e) => {
+        const field = fieldOf(e.target);
+        if (field) setDir(field, true);
+      },
+      true
+    );
   }
 
   function scan(node) {
@@ -75,6 +125,12 @@
 
   new MutationObserver((mutations) => {
     for (const m of mutations) {
+      const field = fieldOf(m.target);
+      if (field) setDir(field, true);
+      else if (m.type === "characterData") {
+        const block = blockOf(m.target.parentElement);
+        if (block?.hasAttribute("data-farsiamo-rtl")) setDir(block);
+      }
       if (m.type === "characterData") enqueue(m.target);
       else m.addedNodes.forEach(enqueue);
     }
