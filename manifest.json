@@ -3,14 +3,26 @@
   "name": "Farsiamo",
   "version": "1.0.0",
   "description": "Renders Persian text with the Vazir font on popular AI chat sites.",
-  "permissions": ["storage", "activeTab", "scripting"],
-  "optional_host_permissions": ["https://*/*"],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "optional_host_permissions": [
+    "https://*/*"
+  ],
   "background": {
     "service_worker": "background.js"
   },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Farsiamo"
+    "default_title": "Farsiamo",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
   },
   "content_scripts": [
     {
@@ -33,15 +45,22 @@
         "https://www.meta.ai/*",
         "https://huggingface.co/chat/*"
       ],
-      "js": ["fonts.js", "content.js"],
+      "js": [
+        "fonts.js",
+        "content.js"
+      ],
       "all_frames": true,
       "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["fonts/*"],
-      "matches": ["https://*/*"]
+      "resources": [
+        "fonts/*"
+      ],
+      "matches": [
+        "https://*/*"
+      ]
     }
   ],
   "content_security_policy": {
@@ -52,5 +71,11 @@
       "id": "farsiamo@local",
       "strict_min_version": "121.0"
     }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   }
 }
